@@ -46,6 +46,7 @@ const Auth = () => {
                     appearance={{ theme: ThemeSupa }}
                     providers={['google']}
                     theme="dark"
+                    redirectTo={window.location.origin}
                     onError={(error) => {
                         console.error('Auth error:', error);
                     }}
