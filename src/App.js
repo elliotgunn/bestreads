@@ -30,7 +30,7 @@ function App() {
 
     const searchBooks = async () => {
         try {
-            const response = await fetch(`/api/books/search?query=${searchQuery}`);
+            const response = await fetch(`/api/books/search?query=${encodeURIComponent(searchQuery)}`);
             const data = await response.json();
             setSearchResults(data.items || []);
         } catch (error) {
