@@ -22,6 +22,11 @@ import Auth from './components/Auth';
 import { supabase } from './supabaseClient';
 
 function App() {
+    console.log('App is rendering, checking environment:', {
+        supabaseUrl: process.env.REACT_APP_SUPABASE_URL ? 'set' : 'not set',
+        supabaseKey: process.env.REACT_APP_SUPABASE_ANON_KEY ? 'set' : 'not set'
+    });
+
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [readingList, setReadingList] = useState([]);
