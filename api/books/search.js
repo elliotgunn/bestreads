@@ -1,45 +1,33 @@
-// Edge Function configuration
-export const config = {
-    runtime: 'edge'
-};
+import { createClient } from '@supabase/supabase-js';
 
-export default async function handler(req) {
+export default async function handler(req, res) {
     // Handle CORS
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Content-Type': 'application/json'
-    };
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers });
+        res.status(204).end();
+        return;
     }
 
     if (req.method !== 'GET') {
-        return new Response(
-            JSON.stringify({ error: 'Method not allowed' }),
-            { status: 405, headers }
-        );
+        res.status(405).json({ error: 'Method not allowed' });
+        return;
     }
 
     try {
-        const url = new URL(req.url);
-        const query = url.searchParams.get('query');
+        const { query } = req.query;
 
         if (!query) {
-            return new Response(
-                JSON.stringify({ error: 'Query parameter is required' }),
-                { status: 400, headers }
-            );
+            res.status(400).json({ error: 'Query parameter is required' });
+            return;
         }
 
         const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY;
         if (!GOOGLE_BOOKS_API_KEY) {
-            return new Response(
-                JSON.stringify({ error: 'Server configuration error' }),
-                { status: 500, headers }
-            );
+            res.status(500).json({ error: 'Server configuration error' });
+            return;
         }
 
         const response = await fetch(
@@ -47,11 +35,8 @@ export default async function handler(req) {
         );
 
         const data = await response.json();
-        return new Response(JSON.stringify(data), { status: 200, headers });
+        res.status(200).json(data);
     } catch (error) {
-        return new Response(
-            JSON.stringify({ error: error.message }),
-            { status: 500, headers }
-        );
+        res.status(500).json({ error: error.message });
     }
 }
