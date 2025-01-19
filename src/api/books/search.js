@@ -1,6 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-export default async function handler(req, res) {
+const handler = async (req, res) => {
     // Handle CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -39,4 +37,6 @@ export default async function handler(req, res) {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-}
+};
+
+export default handler; 

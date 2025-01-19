@@ -1,13 +1,1 @@
-{
-    "routes": [
-        {
-            "src": "/api/books/search",
-            "dest": "/api/books/search.js"
-        }
-    ],
-    "functions": {
-        "api/**/*.js": {
-            "runtime": "nodejs18.x"
-        }
-    }
-}
+{}
