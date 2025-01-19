@@ -11,20 +11,26 @@ import {
     Toolbar,
     List,
     ListItem,
-    ListItemText
+    ListItemText,
+    IconButton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from './contexts/AuthContext';
+import Auth from './components/Auth';
+import { supabase } from './supabaseClient';
 
 function App() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [readingList, setReadingList] = useState([]);
+    const { user, signOut } = useAuth();
     const API_URL = process.env.REACT_APP_API_URL;
 
     const searchBooks = async () => {
         try {
-            const response = await fetch(`${API_URL}/api/books/search?query=${searchQuery}`);
+            const response = await fetch(`/api/books/search?query=${searchQuery}`);
             const data = await response.json();
             setSearchResults(data.items || []);
         } catch (error) {
@@ -34,30 +40,40 @@ function App() {
 
     const addToReadingList = async (book) => {
         try {
-            const response = await fetch(`${API_URL}/api/reading-list`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: book.id,
-                    title: book.volumeInfo.title,
-                    authors: book.volumeInfo.authors,
-                    thumbnail: book.volumeInfo.imageLinks?.thumbnail
-                }),
-            });
-            const data = await response.json();
-            setReadingList([...readingList, data]);
+            // Insert into Supabase
+            const { data, error } = await supabase
+                .from('reading_lists')
+                .insert([
+                    {
+                        user_id: user.id,
+                        book_id: book.id,
+                        title: book.volumeInfo.title,
+                        authors: book.volumeInfo.authors,
+                        thumbnail: book.volumeInfo.imageLinks?.thumbnail,
+                        status: 'to_read'
+                    }
+                ]);
+
+            if (error) throw error;
+            setReadingList([...readingList, data[0]]);
         } catch (error) {
             console.error('Error adding book:', error);
         }
     };
 
+    // If user is not authenticated, show auth component
+    if (!user) {
+        return <Auth />;
+    }
+
     return (
         <div>
             <AppBar position="static">
                 <Toolbar>
-                    <Typography variant="h6">BestReads</Typography>
+                    <Typography variant="h6" style={{ flexGrow: 1 }}>BestReads</Typography>
+                    <IconButton color="inherit" onClick={signOut}>
+                        <LogoutIcon />
+                    </IconButton>
                 </Toolbar>
             </AppBar>
 
