@@ -2,28 +2,38 @@
     "version": 2,
     "builds": [
         {
+            "src": "api/**/*.js",
+            "use": "@vercel/node"
+        },
+        {
             "src": "package.json",
             "use": "@vercel/static-build",
             "config": {
                 "distDir": "build"
             }
-        },
-        {
-            "src": "pages/api/**/*.js",
-            "use": "@vercel/node"
         }
     ],
     "routes": [
         {
-            "src": "/api/(.*)",
-            "dest": "/api/$1"
+            "src": "/api/books/search",
+            "dest": "/api/books/search.js",
+            "methods": [
+                "GET",
+                "OPTIONS"
+            ]
         },
         {
-            "handle": "filesystem"
+            "src": "/static/(.*)",
+            "dest": "/static/$1"
         },
         {
-            "src": "/(.*)",
+            "src": "/((?!api/.*).*)",
             "dest": "/index.html"
         }
-    ]
+    ],
+    "functions": {
+        "api/**/*.js": {
+            "runtime": "edge"
+        }
+    }
 }

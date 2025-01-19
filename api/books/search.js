@@ -1,8 +1,17 @@
+// Edge Function configuration
 export const config = {
-    runtime: 'edge'
+    runtime: 'edge',
+    regions: ['cle1'], // Cleveland region (closest to you)
 };
 
 export default async function handler(req) {
+    // Log request details
+    console.log('Edge Function hit:', {
+        method: req.method,
+        url: req.url,
+        hasApiKey: !!process.env.GOOGLE_BOOKS_API_KEY
+    });
+
     // Handle CORS
     if (req.method === 'OPTIONS') {
         return new Response(null, {
@@ -49,6 +58,7 @@ export default async function handler(req) {
 
         const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY;
         if (!GOOGLE_BOOKS_API_KEY) {
+            console.error('Missing API key in environment');
             return new Response(
                 JSON.stringify({ message: 'Server configuration error' }),
                 {
@@ -61,13 +71,25 @@ export default async function handler(req) {
             );
         }
 
+        console.log('Fetching books for query:', query);
+
         // Fetch books from Google Books API
         const response = await fetch(
             `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&key=${GOOGLE_BOOKS_API_KEY}`,
-            { method: 'GET' }
+            {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }
         );
 
+        if (!response.ok) {
+            throw new Error(`Google Books API responded with status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('Books found:', data.items?.length || 0);
 
         // Return the response
         return new Response(JSON.stringify(data), {
@@ -75,9 +97,11 @@ export default async function handler(req) {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
+                'Cache-Control': 'no-store',
             },
         });
     } catch (error) {
+        console.error('Error in Edge Function:', error);
         return new Response(
             JSON.stringify({
                 message: 'Error fetching books',
