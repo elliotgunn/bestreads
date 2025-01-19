@@ -2,7 +2,7 @@
   "name": "bestreads",
   "version": "1.0.0",
   "description": "A personal reading list application",
-  "main": "server.js",
+  "private": true,
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -24,9 +24,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-scripts": "^5.0.1"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
   },
   "browserslist": {
     "production": [
