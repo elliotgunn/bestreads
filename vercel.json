@@ -9,21 +9,28 @@
             "src": "package.json",
             "use": "@vercel/static-build",
             "config": {
-                "distDir": "build"
+                "distDir": "build",
+                "buildCommand": "npm run build"
             }
         }
     ],
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "/api/$1"
+            "dest": "api/$1.js"
         },
         {
-            "handle": "filesystem"
+            "src": "^/static/(.*)",
+            "dest": "/static/$1"
         },
         {
-            "src": "/(.*)",
+            "src": ".*",
             "dest": "/index.html"
         }
-    ]
+    ],
+    "env": {
+        "GOOGLE_BOOKS_API_KEY": "@google_books_api_key",
+        "REACT_APP_SUPABASE_URL": "@react_app_supabase_url",
+        "REACT_APP_SUPABASE_ANON_KEY": "@react_app_supabase_anon_key"
+    }
 }
