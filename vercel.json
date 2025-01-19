@@ -2,47 +2,24 @@
     "version": 2,
     "builds": [
         {
-            "src": "api/**/*.js",
-            "use": "@vercel/node"
-        },
-        {
             "src": "package.json",
             "use": "@vercel/static-build",
             "config": {
-                "distDir": "build",
-                "buildCommand": "npm run build"
+                "distDir": "build"
             }
         }
     ],
     "routes": [
         {
-            "src": "/api/books/search",
-            "methods": [
-                "GET",
-                "OPTIONS"
-            ],
-            "dest": "/api/books/search.js"
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
         },
         {
-            "src": "/static/(.*)",
-            "dest": "/static/$1"
-        },
-        {
-            "src": "/favicon.ico",
-            "dest": "/favicon.ico"
-        },
-        {
-            "src": "/manifest.json",
-            "dest": "/manifest.json"
+            "handle": "filesystem"
         },
         {
             "src": "/(.*)",
             "dest": "/index.html"
         }
-    ],
-    "env": {
-        "GOOGLE_BOOKS_API_KEY": "@google_books_api_key",
-        "REACT_APP_SUPABASE_URL": "@react_app_supabase_url",
-        "REACT_APP_SUPABASE_ANON_KEY": "@react_app_supabase_anon_key"
-    }
+    ]
 }
